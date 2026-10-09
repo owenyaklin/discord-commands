@@ -1,6 +1,6 @@
 # Getting Started app for Discord
 
-This project contains a basic rock-paper-scissors-style Discord app written in JavaScript, built for the [getting started guide](https://discord.com/developers/docs/getting-started).
+This project contains a basic Discord app written in JavaScript, built for the [getting started guide](https://discord.com/developers/docs/getting-started). It verifies Discord interaction requests, responds to pings, and includes a starter `/testcommand` slash command.
 
 ![Demo of app](https://github.com/discord/discord-example-app/raw/main/assets/getting-started-demo.gif?raw=true)
 
@@ -17,7 +17,6 @@ Below is a basic overview of the project structure:
 ├── .env.sample -> sample .env file
 ├── app.js      -> main entrypoint for app
 ├── commands.js -> slash command payloads + helpers
-├── game.js     -> logic specific to RPS
 ├── utils.js    -> utility functions and enums
 ├── package.json
 ├── README.md
@@ -69,7 +68,11 @@ After your credentials are added, go ahead and run the app:
 node app.js
 ```
 
-> ⚙️ A package [like `nodemon`](https://github.com/remy/nodemon), which watches for local changes and restarts your app, may be helpful while locally developing.
+For local development, start the app with `nodemon` so it restarts when files change:
+
+```
+npm run dev
+```
 
 If you aren't following the [getting started guide](https://discord.com/developers/docs/getting-started), you can move the contents of `examples/app.js` (the finished `app.js` file) to the top-level `app.js`.
 
