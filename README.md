@@ -17,6 +17,8 @@ Below is a basic overview of the project structure:
 ├── .env.sample -> sample .env file
 ├── app.js      -> main entrypoint for app
 ├── commands.js -> slash command payloads + helpers
+├── custom-commands.json -> custom message command names and responses
+├── custom-commands.js   -> loads custom command data
 ├── utils.js    -> utility functions and enums
 ├── package.json
 ├── README.md
@@ -54,7 +56,7 @@ Fetching credentials is covered in detail in the [getting started guide](https:/
 
 ### Install slash commands
 
-The commands for the example app are set up in `commands.js`. All of the commands in the `ALL_COMMANDS` array at the bottom of `commands.js` will be installed when you run the `register` command configured in `package.json`:
+The built-in commands are set up in `commands.js`. Custom message command names and responses are defined in `custom-commands.json` and converted to Discord command payloads automatically. All commands in the `ALL_COMMANDS` array at the bottom of `commands.js` will be installed when you run the `register` command configured in `package.json`:
 
 ```
 npm run register

@@ -7,7 +7,12 @@ import {
   MessageComponentTypes,
   verifyKeyMiddleware,
 } from 'discord-interactions';
+import { CUSTOM_COMMANDS } from './custom-commands.js';
 import { getRandomEmoji } from './utils.js';
+
+const CUSTOM_COMMANDS_BY_NAME = new Map(
+  CUSTOM_COMMANDS.map(({ name, content }) => [name, content]),
+);
 
 // Create an express app
 const app = express();
@@ -51,9 +56,7 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
           ]
         },
       });
-    }
-
-    if (name === 'Test Message Command') {
+    } else if (name === 'Test Message Command') {
       const targetMessage = data.resolved?.messages?.[data.target_id];
       if (!targetMessage) {
         console.error('message command interaction did not include its target message');
@@ -67,6 +70,19 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
           content: content
             ? `Selected message: ${content.slice(0, 1979)}${content.length > 1979 ? '...' : ''}`
             : 'The selected message has no text content.',
+        },
+      });
+    } else if (CUSTOM_COMMANDS_BY_NAME.has(name)) {
+      const targetMessage = data.resolved?.messages?.[data.target_id];
+      if (!targetMessage) {
+        console.error('message command interaction did not include its target message');
+        return res.status(400).json({ error: 'target message not found' });
+      }
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: CUSTOM_COMMANDS_BY_NAME.get(name),
         },
       });
     }
