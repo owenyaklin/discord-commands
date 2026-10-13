@@ -29,4 +29,4 @@ const CUSTOM_MESSAGE_COMMANDS = CUSTOM_COMMANDS.map(({ name }) => ({
 
 const ALL_COMMANDS = [...CUSTOM_MESSAGE_COMMANDS];
 
-InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);
+InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS, process.env.DISCORD_TOKEN);

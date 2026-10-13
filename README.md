@@ -1,6 +1,6 @@
 # Getting Started app for Discord
 
-This project contains a basic Discord app written in JavaScript, built for the [getting started guide](https://discord.com/developers/docs/getting-started). It verifies Discord interaction requests, responds to pings, and includes a starter `/testcommand` slash command.
+This project contains a Discord interactions app built for the [getting started guide](https://discord.com/developers/docs/getting-started). It runs as a Cloudflare Worker, verifies Discord interaction requests, responds to pings, and includes message commands.
 
 ![Demo of app](https://github.com/discord/discord-example-app/raw/main/assets/getting-started-demo.gif?raw=true)
 
@@ -15,11 +15,12 @@ Below is a basic overview of the project structure:
 │   ├── modal.js
 │   ├── selectMenu.js
 ├── .env.sample -> sample .env file
-├── app.js      -> main entrypoint for app
+├── app.js      -> Cloudflare Worker interactions handler
 ├── commands.js -> slash command payloads + helpers
 ├── custom-commands.json -> custom message command names and responses
-├── custom-commands.js   -> loads custom command data
+├── custom-commands.js   -> loads command data for registration
 ├── utils.js    -> utility functions and enums
+├── wrangler.jsonc -> Cloudflare Worker configuration
 ├── package.json
 ├── README.md
 └── .gitignore
@@ -48,11 +49,11 @@ npm install
 ```
 ### Get app credentials
 
-Fetch the credentials from your app's settings and add them to a `.env` file (see `.env.sample` for an example). You'll need your app ID (`APP_ID`), bot token (`DISCORD_TOKEN`), and public key (`PUBLIC_KEY`).
+Fetch the credentials from your app's settings. Put the app ID (`APP_ID`) and bot token (`DISCORD_TOKEN`) in `.env` for registering commands. The Worker verifies interactions with the public key (`PUBLIC_KEY`), which you configure locally in `.dev.vars` and in Cloudflare as a Worker secret.
 
 Fetching credentials is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
 
-> 🔑 Environment variables can be added to the `.env` file in Glitch or when developing locally, and in the Secrets tab in Replit (the lock icon on the left).
+See `.env.sample` for the command-registration variables. Do not commit `.env` or `.dev.vars`.
 
 ### Install slash commands
 
@@ -62,49 +63,40 @@ The built-in commands are set up in `commands.js`. Custom message command names 
 npm run register
 ```
 
-### Run the app
+### Run locally
 
-After your credentials are added, go ahead and run the app:
+Create a `.dev.vars` file containing your Discord public key:
 
+```env
+PUBLIC_KEY=your_discord_public_key
 ```
-node app.js
-```
 
-For local development, start the app with `nodemon` so it restarts when files change:
+Start the local Cloudflare Worker:
 
 ```
 npm run dev
 ```
 
-If you aren't following the [getting started guide](https://discord.com/developers/docs/getting-started), you can move the contents of `examples/app.js` (the finished `app.js` file) to the top-level `app.js`.
+To test interactions with Discord during development, expose Wrangler's local port `8787` through an HTTPS tunnel and set the Discord application's **Interactions Endpoint URL** to that URL followed by `/interactions`.
 
-### Set up interactivity
+### Deploy to Cloudflare
 
-The project needs a public endpoint where Discord can send requests. To develop and test locally, you can use something like [`ngrok`](https://ngrok.com/) to tunnel HTTP traffic.
-
-Install ngrok if you haven't already, then start listening on port `3000`:
+Log in to Cloudflare and deploy the Worker:
 
 ```
-ngrok http 3000
+npx wrangler login
+npm run deploy
 ```
 
-You should see your connection open:
+Set the Discord public key as a Worker secret:
 
 ```
-Tunnel Status                 online
-Version                       2.0/2.0
-Web Interface                 http://127.0.0.1:4040
-Forwarding                    https://1234-someurl.ngrok.io -> localhost:3000
-
-Connections                  ttl     opn     rt1     rt5     p50     p90
-                              0       0       0.00    0.00    0.00    0.00
+npx wrangler secret put PUBLIC_KEY
 ```
 
-Copy the forwarding address that starts with `https`, in this case `https://1234-someurl.ngrok.io`, then go to your [app's settings](https://discord.com/developers/applications).
+Set the Discord application's **Interactions Endpoint URL** to the deployed Worker URL followed by `/interactions`, for example `https://discord-commands.<your-subdomain>.workers.dev/interactions`.
 
-On the **General Information** tab, there will be an **Interactions Endpoint URL**. Paste your ngrok address there, and append `/interactions` to it (`https://1234-someurl.ngrok.io/interactions` in the example).
-
-Click **Save Changes**, and your app should be ready to run 🚀
+The Worker handles interactions without storing data between requests, so it does not need a database.
 
 ## Other resources
 - Read **[the documentation](https://discord.com/developers/docs/intro)** for in-depth information about API features.

@@ -1,0 +1,6 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "discord-commands",
+  "main": "app.js",
+  "compatibility_date": "2026-10-13"
+}
