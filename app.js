@@ -1,71 +1,84 @@
-import 'dotenv/config';
-import express from 'express';
 import {
-  ButtonStyleTypes,
-  InteractionResponseFlags,
   InteractionResponseType,
   InteractionType,
-  MessageComponentTypes,
-  verifyKeyMiddleware,
+  verifyKey,
 } from 'discord-interactions';
-import { getRandomEmoji, DiscordRequest } from './utils.js';
-import { getShuffledOptions, getResult } from './game.js';
+import customCommands from './custom-commands.json';
 
-// Create an express app
-const app = express();
-// Get port, or default to 3000
-const PORT = process.env.PORT || 3000;
-// To keep track of our active games
-const activeGames = {};
+const CUSTOM_COMMANDS_BY_NAME = new Map(
+  customCommands.map(({ name, content }) => [name, content]),
+);
 
-/**
- * Interactions endpoint URL where Discord will send HTTP requests
- * Parse request body and verifies incoming requests using discord-interactions package
- */
-app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async function (req, res) {
-  // Interaction id, type and data
-  const { id, type, data } = req.body;
+function jsonResponse(payload, status = 200) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
 
-  /**
-   * Handle verification requests
-   */
+function handleInteraction(interaction) {
+  const { type, data } = interaction;
+
   if (type === InteractionType.PING) {
-    return res.send({ type: InteractionResponseType.PONG });
+    return jsonResponse({ type: InteractionResponseType.PONG });
   }
 
-  /**
-   * Handle slash command requests
-   * See https://discord.com/developers/docs/interactions/application-commands#slash-commands
-   */
   if (type === InteractionType.APPLICATION_COMMAND) {
     const { name } = data;
 
-    // "test" command
-    if (name === 'test') {
-      // Send a message into the channel where command was triggered from
-      return res.send({
+    if (CUSTOM_COMMANDS_BY_NAME.has(name)) {
+      const targetMessage = data.resolved?.messages?.[data.target_id];
+      if (!targetMessage) {
+        console.error('message command interaction did not include its target message');
+        return jsonResponse({ error: 'target message not found' }, 400);
+      }
+
+      return jsonResponse({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-          flags: InteractionResponseFlags.IS_COMPONENTS_V2,
-          components: [
-            {
-              type: MessageComponentTypes.TEXT_DISPLAY,
-              // Fetches a random emoji to send from a helper function
-              content: `hello world ${getRandomEmoji()}`
-            }
-          ]
+          content: CUSTOM_COMMANDS_BY_NAME.get(name),
         },
       });
     }
 
     console.error(`unknown command: ${name}`);
-    return res.status(400).json({ error: 'unknown command' });
+    return jsonResponse({ error: 'unknown command' }, 400);
   }
 
   console.error('unknown interaction type', type);
-  return res.status(400).json({ error: 'unknown interaction type' });
-});
+  return jsonResponse({ error: 'unknown interaction type' }, 400);
+}
 
-app.listen(PORT, () => {
-  console.log('Listening on port', PORT);
-});
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    if (url.pathname !== '/interactions' || request.method !== 'POST') {
+      return new Response('Not found', { status: 404 });
+    }
+
+    const rawBody = await request.text();
+    const signature = request.headers.get('X-Signature-Ed25519');
+    const timestamp = request.headers.get('X-Signature-Timestamp');
+    if (
+      !signature ||
+      !timestamp ||
+      !(await verifyKey(rawBody, signature, timestamp, env.PUBLIC_KEY))
+    ) {
+      return new Response('invalid request signature', { status: 401 });
+    }
+
+    let interaction;
+    try {
+      interaction = JSON.parse(rawBody);
+    } catch {
+      return jsonResponse({ error: 'invalid JSON' }, 400);
+    }
+
+    try {
+      return handleInteraction(interaction);
+    } catch (error) {
+      console.error('Error handling interaction:', error);
+      return jsonResponse({ error: 'internal server error' }, 500);
+    }
+  },
+};

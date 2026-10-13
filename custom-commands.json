@@ -1,0 +1,77 @@
+[
+  {
+    "variable": "BAD_HYDRATION_GIRL",
+    "name": "Bad Hydration Girl",
+    "content": "You're a bad hydration girl, aren't you?"
+  },
+  {
+    "variable": "GLOWING_SKIN",
+    "name": "Skin Is Glowing",
+    "content": "That must be why your skin is glowing."
+  },
+  {
+    "variable": "BODY_ASKED_FOR",
+    "name": "Body Asked For",
+    "content": "Congratulations on drinking the one thing your body actually asked for."
+  },
+  {
+    "variable": "CAFFEINE_POOR_DECISIONS",
+    "name": "Caffeine And Poor Decisions",
+    "content": "Today's personality is sponsored by caffeine and poor decisions."
+  },
+  {
+    "variable": "COFFEE_TRAINING_WHEELS",
+    "name": "Coffee With Training Wheels",
+    "content": "Coffee with training wheels. Adorable."
+  },
+  {
+    "variable": "ENERGY_BATTERY_ACID",
+    "name": "Energy Is Battery Acid",
+    "content": "Your ancestors survived on berries and water. You need radioactive battery acid."
+  },
+  {
+    "variable": "REGULAR_SODA_SINS",
+    "name": "Regular Soda Sins",
+    "content": "The fitness gods have seen your sins."
+  },
+  {
+    "variable": "DIET_SODA_ZERO_RESPECT",
+    "name": "Diet Soda Zero Respect",
+    "content": "Zero calories. Still zero respect."
+  },
+  {
+    "variable": "PROTEIN_SHAKE_PERSONALITY",
+    "name": "Protein Shake Personality",
+    "content": "Your biceps are growing. Your personality remains under review."
+  },
+  {
+    "variable": "COCKTAIL_CHARACTER",
+    "name": "Cocktail Character",
+    "content": "You're not ruining your gains. You're giving them a character arc."
+  },
+  {
+    "variable": "LONG_HARD_BOTTLE",
+    "name": "Long Hard Bottle",
+    "content": "Finally, someone who knows how to handle a long, hard bottle."
+  },
+  {
+    "variable": "SWALLOW_CONFIDENTLY",
+    "name": "Swallow Confidently",
+    "content": "That's a lot of liquid. You always swallow that confidently?"
+  },
+  {
+    "variable": "THIRSTY",
+    "name": "Thirsty",
+    "content": "Your drink isn't the only thing making this server thirsty."
+  },
+  {
+    "variable": "PRETEND_GOOD_IDEA",
+    "name": "Pretend Good Idea",
+    "content": "I am contractually obligated to pretend this is a good idea."
+  },
+  {
+    "variable": "DRINK_WATER",
+    "name": "Drink Water",
+    "content": "Drink water, you dehydrated little goblin."
+  }
+]
