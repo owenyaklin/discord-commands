@@ -1,12 +1,9 @@
 import {
-  InteractionResponseFlags,
   InteractionResponseType,
   InteractionType,
-  MessageComponentTypes,
   verifyKey,
 } from 'discord-interactions';
 import customCommands from './custom-commands.json';
-import { getRandomEmoji } from './utils.js';
 
 const CUSTOM_COMMANDS_BY_NAME = new Map(
   customCommands.map(({ name, content }) => [name, content]),
@@ -28,39 +25,6 @@ function handleInteraction(interaction) {
 
   if (type === InteractionType.APPLICATION_COMMAND) {
     const { name } = data;
-
-    if (name === 'testcommand') {
-      return jsonResponse({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          flags: InteractionResponseFlags.IS_COMPONENTS_V2,
-          components: [
-            {
-              type: MessageComponentTypes.TEXT_DISPLAY,
-              content: `hello world ${getRandomEmoji()}`,
-            },
-          ],
-        },
-      });
-    }
-
-    if (name === 'Test Message Command') {
-      const targetMessage = data.resolved?.messages?.[data.target_id];
-      if (!targetMessage) {
-        console.error('message command interaction did not include its target message');
-        return jsonResponse({ error: 'target message not found' }, 400);
-      }
-
-      const content = targetMessage.content;
-      return jsonResponse({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          content: content
-            ? `Selected message: ${content.slice(0, 1979)}${content.length > 1979 ? '...' : ''}`
-            : 'The selected message has no text content.',
-        },
-      });
-    }
 
     if (CUSTOM_COMMANDS_BY_NAME.has(name)) {
       const targetMessage = data.resolved?.messages?.[data.target_id];
