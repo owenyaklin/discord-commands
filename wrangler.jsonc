@@ -2,5 +2,14 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "discord-commands",
   "main": "app.js",
-  "compatibility_date": "2026-10-13"
+  "compatibility_date": "2026-10-13",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "discord-commands",
+      "database_id": "e7b3fa89-f6ba-4bd4-9627-41ab95426694",
+      "migrations_dir": "migrations",
+      "remote": true
+    }
+  ]
 }

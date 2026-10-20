@@ -55,9 +55,34 @@ Fetching credentials is covered in detail in the [getting started guide](https:/
 
 See `.env.sample` for the command-registration variables. Do not commit `.env` or `.dev.vars`.
 
-### Install slash commands
+### Set up the interaction database
 
-The built-in commands are set up in `commands.js`. Custom message command names and responses are defined in `custom-commands.json` and converted to Discord command payloads automatically. All commands in the `ALL_COMMANDS` array at the bottom of `commands.js` will be installed when you run the `register` command configured in `package.json`:
+Create a D1 database and replace `REPLACE_WITH_DATABASE_ID` in `wrangler.jsonc`
+with the database ID returned by Wrangler:
+
+```
+npx wrangler d1 create discord-commands
+```
+
+Apply the migration locally and remotely:
+
+```
+npx wrangler d1 migrations apply discord-commands --local
+npx wrangler d1 migrations apply discord-commands --remote
+```
+
+The Worker also needs the bot token to post the selected hydration message as a
+reply to the original message. Set it as a Cloudflare secret:
+
+```
+npx wrangler secret put DISCORD_TOKEN
+```
+
+### Install commands
+
+The `Hydrate` message command is set up in `commands.js`. Its select-menu options
+and response messages are defined in `custom-commands.json`. Run the `register`
+command to install it:
 
 ```
 npm run register
@@ -96,7 +121,9 @@ npx wrangler secret put PUBLIC_KEY
 
 Set the Discord application's **Interactions Endpoint URL** to the deployed Worker URL followed by `/interactions`, for example `https://discord-commands.<your-subdomain>.workers.dev/interactions`.
 
-The Worker handles interactions without storing data between requests, so it does not need a database.
+The Worker stores the target message and invoking user for each hydration
+interaction in D1. These records expire after 24 hours and are removed as new
+interactions are created.
 
 ## Other resources
 - Read **[the documentation](https://discord.com/developers/docs/intro)** for in-depth information about API features.
